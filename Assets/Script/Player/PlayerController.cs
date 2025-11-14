@@ -6,7 +6,7 @@ public class PlayerController : MonoBehaviour
     [Header("Horizontal Movement Setting")]
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private float walkSpeed = 1;
-    private float xAxis;
+    private float xAxis, yAxis;
 
 	[Header("Vertical Movement Setting")]
 	[SerializeField] private float jumpForce = 45;
@@ -31,11 +31,20 @@ public class PlayerController : MonoBehaviour
     PlayerStateList pState;
 
 	[Header("Dash Setting")]
-	private bool canDash;
+	private bool canDash = true;
     private bool dashed;
     private float gravity;
 
-    private void Awake()
+    [Header("Attacking")]
+	bool attack = false;
+    float timeBetweenAttack, timeSinceAttack;
+    [SerializeField] Transform SideAttackTransform, UpAttackTransform, DownAttackTransform;
+    [SerializeField] Vector2 SideAttackArea, UpAttackArea, DownAttackArea;
+    [SerializeField] LayerMask attackableLayer;
+
+
+
+	private void Awake()
     {
         if (Instance != null && Instance != this)
         {
@@ -56,6 +65,14 @@ public class PlayerController : MonoBehaviour
         gravity = rb.gravityScale;
     }
 
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawCube(SideAttackTransform.position, SideAttackArea);
+        Gizmos.DrawCube(UpAttackTransform.position, UpAttackArea);
+        Gizmos.DrawCube(DownAttackTransform.position, DownAttackArea);
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -66,11 +83,14 @@ public class PlayerController : MonoBehaviour
         UpdateJumpVariables();
         if(pState.dashing) return;
         StartDash();
+        Attack();
     }
 
     void GetInput()
     {
         xAxis = Input.GetAxisRaw("Horizontal");
+        yAxis = Input.GetAxisRaw("Vertical");
+        attack = Input.GetMouseButtonDown(0);
     }
 
     void Flip()
@@ -117,6 +137,39 @@ public class PlayerController : MonoBehaviour
         canDash = true;
 
     }
+
+    void Attack()
+    {
+        timeSinceAttack += Time.deltaTime;
+        if(attack && timeSinceAttack >= timeBetweenAttack)
+        {
+            timeSinceAttack = 0;
+
+			if ((yAxis == 0 || yAxis < 0) && Grounded())
+			{
+                Hit(SideAttackTransform, SideAttackArea);
+			}
+            else if(yAxis > 0)
+            {
+				Hit(UpAttackTransform, UpAttackArea);
+			}
+            else if(yAxis < 0 && !Grounded())
+            {
+				Hit(DownAttackTransform, DownAttackArea);
+			}
+
+
+		}
+	}
+
+    private void Hit(Transform _attackTransform, Vector2 _attackArea)
+    {
+        Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);
+        if (objectsToHit.Length > 0)
+            {
+            Debug.Log("Hit");
+            }
+        }
 
     public bool Grounded()
     {
