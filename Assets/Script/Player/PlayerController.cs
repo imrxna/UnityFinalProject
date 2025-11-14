@@ -41,6 +41,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Transform SideAttackTransform, UpAttackTransform, DownAttackTransform;
     [SerializeField] Vector2 SideAttackArea, UpAttackArea, DownAttackArea;
     [SerializeField] LayerMask attackableLayer;
+    [SerializeField] float damage;
 
 
 
@@ -169,7 +170,14 @@ public class PlayerController : MonoBehaviour
             {
             Debug.Log("Hit");
             }
+        for (int i = 0; i < objectsToHit.Length; i++)
+        {
+            if(objectsToHit[i].GetComponent<Enermy>() != null)
+            {
+                objectsToHit[i].GetComponent<Enermy>().EnermyHit(damage);
+            }
         }
+    }
 
     public bool Grounded()
     {
