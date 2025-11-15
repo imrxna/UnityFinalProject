@@ -50,6 +50,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] int recoilYstep = 5;
     [SerializeField] float recoilXSpeed = 100;
     [SerializeField] float recoilYSpeed = 100;
+    int stepsXRecoiled, stepsYRecoiled;
 
 
 
@@ -234,6 +235,39 @@ public class PlayerController : MonoBehaviour
         {
             rb.gravityScale = gravity;
         }
+        //stop recoil
+        if (pState.recollingX && stepsXRecoiled < recoilXstep)
+        {
+            stepsXRecoiled++;
+        }
+        else
+        {
+            StopRecoilX();
+        }
+        if (pState.recollingY && stepsYRecoiled < recoilYstep)
+        {
+            stepsYRecoiled++;
+        }
+        else
+        {
+            StopRecoilY();
+        }
+        if(Grounded())
+        {
+            StopRecoilY();
+        }
+	}
+
+
+	void StopRecoilX()
+    {
+        stepsXRecoiled = 0; 
+        pState.recollingX = false;
+    }
+    void StopRecoilY()
+    {
+        stepsYRecoiled = 0; 
+        pState.recollingY = false;
     }
 	public bool Grounded()
     {
