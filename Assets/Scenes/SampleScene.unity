@@ -427,7 +427,6 @@ GameObject:
   - component: {fileID: 643893493}
   - component: {fileID: 643893492}
   - component: {fileID: 643893491}
-  - component: {fileID: 643893490}
   - component: {fileID: 643893494}
   - component: {fileID: 643893495}
   m_Layer: 6
@@ -437,22 +436,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &643893490
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 643893489}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42e4ce3f55d1a2c4088f135860c8b8b5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  health: 8
-  recoillength: 0
-  recoillFactor: 0
-  isRecoilling: 0
 --- !u!50 &643893491
 Rigidbody2D:
   serializedVersion: 5
@@ -608,10 +591,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42e4ce3f55d1a2c4088f135860c8b8b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 10
-  recoillength: 1
-  recoillFactor: 50
-  isRecoilling: 0
+  health: 8
+  recoilLength: 0
+  recoilFactor: 0
+  isRecoiling: 0
+  speed: 0
+  damage: 0
 --- !u!1 &706133316
 GameObject:
   m_ObjectHideFlags: 0
@@ -1091,7 +1076,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81003e3698be9fc4f98023d02309d268, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb: {fileID: 0}
   walkSpeed: 20
   jumpForce: 10
   jumpBufferFrames: 8
@@ -1106,20 +1090,40 @@ MonoBehaviour:
   dashSpeed: 70
   dashTime: 0.2
   dashCooldown: 0.35
+  dashEffect: {fileID: 0}
   SideAttackTransform: {fileID: 859630547}
-  UpAttackTransform: {fileID: 1593653573}
-  DownAttackTransform: {fileID: 357439725}
   SideAttackArea: {x: 1, y: 1}
+  UpAttackTransform: {fileID: 1593653573}
   UpAttackArea: {x: 1, y: 1}
+  DownAttackTransform: {fileID: 357439725}
   DownAttackArea: {x: 1, y: 1}
   attackableLayer:
     serializedVersion: 2
     m_Bits: 0
+  timeBetweenAttack: 0
   damage: 2
-  recoilXstep: 0
-  recoilYstep: 5
+  slashEffect: {fileID: 0}
+  recoilXSteps: 5
+  recoilYSteps: 5
   recoilXSpeed: 100
   recoilYSpeed: 100
+  health: 20
+  maxHealth: 0
+  bloodSpurt: {fileID: 0}
+  hitFlashSpeed: 0
+  timeToHeal: 0
+  manaStorage: {fileID: 0}
+  mana: 0
+  manaDrainSpeed: 0
+  manaGain: 0
+  manaSpellCost: 0.3
+  timeBetweenCast: 0.5
+  spellDamage: 0
+  downSpellForce: 0
+  sideSpellFireball: {fileID: 859630546}
+  upSpellExplosion: {fileID: 1593653572}
+  downSpellFireball: {fileID: 357439724}
+  pState: {fileID: 0}
 --- !u!114 &1334948932
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1134,9 +1138,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   jumping: 1
   dashing: 1
-  recollingX: 0
-  recollingY: 0
+  recoilingX: 1
+  recoilingY: 1
   lookingRight: 1
+  invincible: 1
+  healing: 1
+  casting: 1
 --- !u!1 &1593653572
 GameObject:
   m_ObjectHideFlags: 0
