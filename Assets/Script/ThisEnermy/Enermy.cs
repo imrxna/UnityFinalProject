@@ -29,7 +29,12 @@ public class Enermy : MonoBehaviour
         {
             if(recoilTimer < recoillength)
             {
-
+                recoilTimer += Time.deltaTime;
+            }
+            else
+            {
+                isRecoilling = false;
+                recoilTimer = 0;    
             }
         }
     }

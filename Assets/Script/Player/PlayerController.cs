@@ -163,23 +163,36 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
-    private void Hit(Transform _attackTransform, Vector2 _attackArea)
-    {
-        Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);
-        if (objectsToHit.Length > 0)
-            {
-            Debug.Log("Hit");
-            }
-        for (int i = 0; i < objectsToHit.Length; i++)
-        {
-            if(objectsToHit[i].GetComponent<Enermy>() != null)
-            {
-                objectsToHit[i].GetComponent<Enermy>().EnermyHit(damage);
-            }
-        }
-    }
+	private void Hit(Transform _attackTransform, Vector2 _attackArea)
+	{
+		Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(
+			_attackTransform.position,
+			_attackArea,
+			0,
+			attackableLayer
+		);
 
-    public bool Grounded()
+		if (objectsToHit.Length > 0)
+		{
+			Debug.Log("Hit");
+		}
+
+		for (int i = 0; i < objectsToHit.Length; i++)
+		{
+			Enermy enemy = objectsToHit[i].GetComponent<Enermy>();
+			if (enemy != null)
+			{
+				enemy.EnermyHit(
+					damage,
+					(transform.position - objectsToHit[i].transform.position).normalized,
+					100
+				);
+			}
+		}
+	}
+
+
+	public bool Grounded()
     {
         if (Physics2D.Raycast(groundCheckPoint.position, Vector2.down, groundCheckY, whatIsGround) || Physics2D.Raycast(groundCheckPoint.position + new Vector3(groundCheckX, 0, 0), Vector2.down, groundCheckY, whatIsGround) || Physics2D.Raycast(groundCheckPoint.position + new Vector3(groundCheckY, 0, 0), Vector2.down, groundCheckY, whatIsGround))
         {
