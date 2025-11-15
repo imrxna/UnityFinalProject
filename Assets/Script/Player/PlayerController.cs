@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -44,6 +45,13 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float damage;
 
 
+    [Header("Recoil")]
+    [SerializeField] int recoilXstep = 5;
+    [SerializeField] int recoilYstep = 5;
+    [SerializeField] float recoilXSpeed = 100;
+    [SerializeField] float recoilYSpeed = 100;
+
+
 
 	private void Awake()
     {
@@ -85,6 +93,7 @@ public class PlayerController : MonoBehaviour
         if(pState.dashing) return;
         StartDash();
         Attack();
+        Recoil();
     }
 
     void GetInput()
@@ -99,10 +108,12 @@ public class PlayerController : MonoBehaviour
         if (xAxis < 0)
         {
             transform.localScale = new Vector2(-1, transform.localScale.y);
+            pState.lookingRight = false;
         }
         else if (xAxis > 0)
         {
             transform.localScale = new Vector2(1, transform.localScale.y);
+            pState.lookingRight = true; 
         }
     }
     private void Move()
@@ -139,42 +150,40 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    void Attack()
-    {
-        timeSinceAttack += Time.deltaTime;
-        if(attack && timeSinceAttack >= timeBetweenAttack)
-        {
-            timeSinceAttack = 0;
+	void Attack()
+	{
+		timeSinceAttack += Time.deltaTime;
 
+		if (attack && timeSinceAttack >= timeBetweenAttack)
+		{
+			timeSinceAttack = 0;
+
+			
 			if ((yAxis == 0 || yAxis < 0) && Grounded())
 			{
-                Hit(SideAttackTransform, SideAttackArea);
+				Hit(SideAttackTransform, SideAttackArea, ref pState.recollingX, recoilXSpeed);
 			}
-            else if(yAxis > 0)
-            {
-				Hit(UpAttackTransform, UpAttackArea);
+			
+			else if (yAxis > 0)
+			{
+				Hit(UpAttackTransform, UpAttackArea, ref pState.recollingY, recoilYSpeed);
 			}
-            else if(yAxis < 0 && !Grounded())
-            {
-				Hit(DownAttackTransform, DownAttackArea);
+			
+			else if (yAxis < 0 && !Grounded())
+			{
+				Hit(DownAttackTransform, DownAttackArea, ref pState.recollingY, recoilYSpeed);
 			}
-
-
 		}
 	}
 
-	private void Hit(Transform _attackTransform, Vector2 _attackArea)
+
+	private void Hit(Transform _attackTransform,Vector2 _attackArea,ref bool _recoilDir,float _recoilStength)
 	{
-		Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(
-			_attackTransform.position,
-			_attackArea,
-			0,
-			attackableLayer
-		);
+		Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position,_attackArea,0,attackableLayer);
 
 		if (objectsToHit.Length > 0)
 		{
-			Debug.Log("Hit");
+			_recoilDir = true;
 		}
 
 		for (int i = 0; i < objectsToHit.Length; i++)
@@ -184,14 +193,48 @@ public class PlayerController : MonoBehaviour
 			{
 				enemy.EnermyHit(
 					damage,
-					(transform.position - objectsToHit[i].transform.position).normalized,
-					100
-				);
+					(transform.position - objectsToHit[i].transform.position).normalized , _recoilStength);
 			}
 		}
 	}
 
 
+	//void SlashEffect()
+
+	void Recoil()
+    {
+        if (pState.recollingX)
+        {
+            if(pState.lookingRight)
+            {
+                rb.linearVelocity = new Vector2 (-recoilXSpeed, 0);
+            }
+            else
+            {
+                rb.linearVelocity = new Vector2 (recoilXSpeed, 0);  
+            }
+        }
+
+        if (pState.recollingY)
+        {
+            rb.gravityScale = 0;
+
+            if(yAxis < 0)
+            {
+                
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, recoilYSpeed);
+            }
+            else
+            {
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, -recoilYSpeed);
+            }
+            airJumpCounter = 0;
+        }
+        else
+        {
+            rb.gravityScale = gravity;
+        }
+    }
 	public bool Grounded()
     {
         if (Physics2D.Raycast(groundCheckPoint.position, Vector2.down, groundCheckY, whatIsGround) || Physics2D.Raycast(groundCheckPoint.position + new Vector3(groundCheckX, 0, 0), Vector2.down, groundCheckY, whatIsGround) || Physics2D.Raycast(groundCheckPoint.position + new Vector3(groundCheckY, 0, 0), Vector2.down, groundCheckY, whatIsGround))
