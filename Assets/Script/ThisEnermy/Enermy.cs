@@ -2,24 +2,28 @@ using UnityEngine;
 
 public class Enermy : MonoBehaviour
 {
-    [SerializeField] float health;
-    [SerializeField] float recoillength;
-    [SerializeField] float recoillFactor;
-    [SerializeField] bool isRecoilling = false;
+    [SerializeField] protected float health;
+    [SerializeField] protected float recoillength;
+    [SerializeField] protected float recoillFactor;
+    [SerializeField] protected bool isRecoilling = false;
 
-    float recoilTimer;
-    Rigidbody2D rb;
+    [SerializeField]protected PlayerController player;
+    [SerializeField]protected float speed;
+
+    protected float recoilTimer;
+    protected Rigidbody2D rb;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public virtual void Start()
     {
         
     }
-    private void Awake()
+    public virtual void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        player = PlayerController.Instance;
     }
     // Update is called once per frame
-    void Update()
+    public virtual void Update()
     {
         if(health <=0)
         {
@@ -39,7 +43,7 @@ public class Enermy : MonoBehaviour
         }
     }
     
-    public void EnermyHit(float _damageDone, Vector2 _hitDirection, float _hitForce)
+    public virtual void EnermyHit(float _damageDone, Vector2 _hitDirection, float _hitForce)
     {
         health -= _damageDone;
         if(!isRecoilling)
